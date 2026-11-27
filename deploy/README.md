@@ -59,14 +59,36 @@ docker compose start collector
 ```
 
 ## 5. Add the connector
-Endpoint: `https://<PUBLIC_HOST>/mcp` with header `Authorization: Bearer <MCP_API_KEY>`.
-- **Claude:** Settings -> Connectors -> Add custom connector. If there is no header field, use
-  `https://<PUBLIC_HOST>/k/<MCP_API_KEY>/mcp` (key inside the URL: treat the URL as a secret).
-- **ChatGPT:** Settings -> Connectors -> Advanced -> Developer mode -> create connector with the same URL.
-The exact UI changes often and was not verified by me; see the top-level README.
+**Connector address** (the key goes in the path; the Claude custom connector cannot send headers):
+
+```
+https://flashly-mcp-bk.denmarkeast.cloudapp.azure.com/mcp/<MCP_API_KEY>
+```
+- **Claude:** Settings -> Connectors -> Add custom connector -> paste the URL above with your real key.
+  Get the key on the server only: `grep ^MCP_API_KEY ~/flashly/.env`.
+- **ChatGPT / clients that can send headers:** `https://<PUBLIC_HOST>/mcp` plus `Authorization: Bearer <MCP_API_KEY>`.
+- No key, a wrong key, or `/mcp/` alone returns `401`. OAuth discovery endpoints
+  (`/.well-known/oauth-protected-resource`) are intentionally not implemented.
+
+Check from any machine (replace the placeholder):
+```bash
+H=https://flashly-mcp-bk.denmarkeast.cloudapp.azure.com
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $H/mcp                 # 401
+curl -s -o /dev/null -w "%{http_code}\n" -X POST $H/mcp/wrong-key       # 401
+curl -s $H/health                                                         # {"ok": true}
+```
+
+**Verify the key is not in Caddy logs** (do this once after the first real request with the key):
+```bash
+docker compose run --rm caddy caddy validate --config /etc/caddy/Caddyfile   # syntax check
+docker compose logs caddy | grep -c "$(grep ^MCP_API_KEY .env | cut -d= -f2)"   # must print 0
+docker compose logs caddy | grep -o '"uri":"[^"]*"' | tail -3                    # expect /mcp/***
+```
+If the count is not 0, stop exposing the endpoint, rotate `MCP_API_KEY` and report it: the Caddyfile
+log filter was written from the docs and has not been run by me.
 
 ## 6. Security notes
 - `.env` has mode 600 and stays on the server. The Instagram token lasts ~60 days: check `get_token_status`
   or `docker compose logs collector | grep TOKEN`; refresh before expiry.
-- Caddy has no access log (the `/k/<key>/` fallback would put the key into it).
+- Caddy logs (access and error) rewrite `/mcp/<key>` to `/mcp/***`; Authorization headers are redacted by Caddy.
 - Rotate the key: edit `MCP_API_KEY`, `docker compose up -d`, update the connector.

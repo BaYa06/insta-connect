@@ -1,7 +1,25 @@
 # Automatic HTTPS (Let's Encrypt) for the host in PUBLIC_HOST. Ports 80/443 must be reachable.
-# No access log on purpose: the /k/<key>/ URL fallback carries the credential in the path.
+#
+# The MCP key can travel in the URL path (/mcp/<key>), so every Caddy log (access AND error,
+# both go through the filter) rewrites that path to /mcp/***. Authorization headers are
+# redacted by Caddy itself. Verify on the server after first start: see deploy/README.md.
+{
+	log default {
+		output stdout
+		format filter {
+			request>uri regexp "^/mcp/[^/?]+" "/mcp/***"
+		}
+	}
+}
+
 {$PUBLIC_HOST} {
 	encode gzip
+	log {
+		output stdout
+		format filter {
+			request>uri regexp "^/mcp/[^/?]+" "/mcp/***"
+		}
+	}
 	reverse_proxy mcp-server:8000 {
 		flush_interval -1   # do not buffer SSE streams
 	}

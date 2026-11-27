@@ -26,11 +26,11 @@ cp .env.example .env     # fill IG_ACCESS_TOKEN (and META_APP_SECRET) yourself; 
 The endpoint refuses to start without `MCP_AUTH_TOKEN` (>= 32 chars) in `.env`.
 Generate one: `python3 -c "import secrets;print(secrets.token_urlsafe(48))"`.
 
-Two ways to present the key:
-1. **Header (preferred):** `Authorization: Bearer <key>`.
-2. **URL path (fallback):** `https://HOST/k/<key>/mcp`, for connector UIs that only accept a URL.
-   Weaker: URLs end up in browser history, proxies and tunnel logs. Server logs and uvicorn access
-   logs hide it. Disable with `--no-path-key`. Rotate the key if the URL leaks.
+Two ways to present the key (either one is enough):
+1. **Header:** `Authorization: Bearer <key>` on `https://HOST/mcp`.
+2. **URL path:** `https://HOST/mcp/<key>`, for clients that cannot send headers (Claude custom connector).
+   Weaker: URLs can end up in browser history and proxies. The app and Caddy mask the path
+   (`/mcp/***`) in all logs. Disable with `--no-path-key`. Treat the URL as a secret and rotate the key if it leaks.
 
 Without a valid key: `401` + `WWW-Authenticate: Bearer`. `GET /healthz` is open and returns only `{"ok": true}`.
 Rotate: change `MCP_AUTH_TOKEN` in `.env`, restart, update the connector.
@@ -54,14 +54,12 @@ The laptop must stay awake and both processes (server and tunnel) running.
 
 ## Add the connector (check the current UI; Anthropic and OpenAI change it often)
 **Claude** (claude.ai): Settings -> Connectors -> Add custom connector.
-Name: `Flashly Instagram`. URL: the fallback form `https://<host>/k/<key>/mcp`. As far as I know the
-dialog only offers a URL and optional OAuth fields, not a custom header. If your version has an
-API-key/header field, use the plain `https://<host>/mcp` URL with the Bearer header instead.
+Name: `Flashly Instagram`. URL: `https://<host>/mcp/<MCP_API_KEY>` (the connector cannot send an Authorization header).
 Then enable the connector in a chat (the "+" / tools menu).
 
 **ChatGPT:** Settings -> Connectors -> Advanced -> enable Developer mode (availability depends on plan),
 then create a connector: MCP server URL as above. If it offers "No authentication"/OAuth only, use the
-`/k/<key>/` URL. Workspace admins may need to allow custom connectors.
+`/mcp/<key>` URL. Workspace admins may need to allow custom connectors.
 
 If a client cannot connect, run `scripts/smoke_http.py` against the same URL first: it separates
 server/tunnel problems from client-UI problems.

@@ -30,6 +30,10 @@ async def main(base: str) -> int:
             good = r.status_code == 401
             ok &= good
             print(f"[{'OK' if good else 'FAIL'}] {label}: HTTP {r.status_code} (ожидается 401)")
+        r = await h.post(f"{base}/mcp/wrong-key", json={})
+        good = r.status_code == 401
+        ok &= good
+        print(f"[{'OK' if good else 'FAIL'}] неверный ключ в пути: HTTP {r.status_code} (ожидается 401)")
         r = await h.get(f"{base}/health")
         print(f"[{'OK' if r.status_code == 200 else 'FAIL'}] /health: HTTP {r.status_code}")
     async with streamablehttp_client(f"{base}/mcp", headers={"Authorization": f"Bearer {key}"}) as (rd, wr, _):
@@ -40,6 +44,11 @@ async def main(base: str) -> int:
             res = await s.call_tool("get_profile", {})
             print(f"[{'FAIL' if res.isError else 'OK'}] get_profile: {mask(res.content[0].text)[:120].replace(chr(10), ' ')}")
             ok &= not res.isError
+    async with streamablehttp_client(f"{base}/mcp/{key}") as (rd, wr, _):  # no Authorization header
+        async with ClientSession(rd, wr) as s:
+            await s.initialize()
+            n = len((await s.list_tools()).tools)
+            print(f"[OK] ключ в пути /mcp/<key> (без заголовка): {n} tools")
     return 0 if ok else 1
 
 

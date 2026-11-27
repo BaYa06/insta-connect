@@ -1,11 +1,12 @@
-"""Bearer-key protection for the MCP endpoint (pure ASGI middleware).
+"""Key protection for the MCP endpoint (pure ASGI middleware).
 
-Accepted credentials (either one):
-  1. `Authorization: Bearer <key>`            (preferred)
-  2. URL path prefix `/k/<key>/mcp`           (fallback for connector UIs that only take a URL)
+Accepted credentials (either one is enough):
+  1. `Authorization: Bearer <key>`  on  /mcp
+  2. Key in the path:               /mcp/<key>   (for clients that cannot send headers, e.g. the
+     Claude custom connector). The prefix is stripped, so the MCP app still sees /mcp.
 
 Everything else gets 401. `/health` (and `/healthz`) is open and returns no data.
-The key is never logged; failures log only the client address and path *without* the key.
+The key is never logged: failures log the client address and the path with the key replaced by ***.
 """
 from __future__ import annotations
 
@@ -15,7 +16,8 @@ import logging
 
 log = logging.getLogger("flashly.auth")
 MIN_KEY_LENGTH = 32
-PATH_PREFIX = "/k/"
+MCP_PATH = "/mcp"
+PATH_PREFIX = MCP_PATH + "/"
 
 
 def _eq(a: str, b: str) -> bool:
@@ -50,11 +52,11 @@ class BearerAuthMiddleware:
         auth = headers.get(b"authorization", b"").decode("latin-1")
         if auth[:7].lower() == "bearer ":
             authorized = _eq(auth[7:].strip(), self.key)
-        elif self.allow_path_key and path.startswith(PATH_PREFIX):
-            _, _, supplied, *rest = path.split("/", 3)
-            if _eq(supplied, self.key):
+        if not authorized and self.allow_path_key and path.startswith(PATH_PREFIX):
+            parts = path.split("/", 3)  # ['', 'mcp', '<key>', 'rest...']
+            if _eq(parts[2], self.key):
                 authorized = True
-                new_path = "/" + (rest[0] if rest else "")
+                new_path = MCP_PATH + ("/" + parts[3] if len(parts) > 3 and parts[3] else "")
                 scope = {**scope, "path": new_path, "raw_path": new_path.encode()}
 
         if not authorized:

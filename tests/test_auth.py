@@ -39,16 +39,32 @@ async def test_bearer_scheme_case_insensitive(client):
     assert (await client.get("/mcp", headers={"Authorization": f"bearer {KEY}"})).status_code == 200
 
 
-async def test_path_key_fallback_strips_prefix(client):
-    r = await client.post(f"/k/{KEY}/mcp")
+async def test_path_key_strips_prefix(client):
+    for url in (f"/mcp/{KEY}", f"/mcp/{KEY}/"):
+        r = await client.post(url)
+        assert r.status_code == 200 and r.text == "/mcp", url
+
+
+async def test_path_key_wrong_or_missing_is_401(client):
+    for url in ("/mcp/wrong", "/mcp/", "/mcp", f"/mcp/{KEY}x", f"/mcp/x{KEY}", "/other/" + KEY):
+        assert (await client.post(url)).status_code == 401, url
+
+
+async def test_old_k_prefix_no_longer_works(client):
+    assert (await client.post(f"/k/{KEY}/mcp")).status_code == 401
+
+
+async def test_header_still_works_alongside_path_key(client):
+    r = await client.post("/mcp", headers={"Authorization": f"Bearer {KEY}"})
     assert r.status_code == 200 and r.text == "/mcp"
-    assert (await client.post("/k/wrong/mcp")).status_code == 401
+    r = await client.post(f"/mcp/{KEY}", headers={"Authorization": "Bearer wrong"})
+    assert r.status_code == 200  # a valid path key is enough
 
 
 async def test_path_key_can_be_disabled():
     app = BearerAuthMiddleware(dummy, KEY, allow_path_key=False)
     c = httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t")
-    assert (await c.post(f"/k/{KEY}/mcp")).status_code == 401
+    assert (await c.post(f"/mcp/{KEY}")).status_code == 401
 
 
 @pytest.mark.parametrize("path", ["/health", "/healthz"])
@@ -59,8 +75,8 @@ async def test_health_open_and_data_free(client, path):
 
 async def test_401_log_hides_path_key(client, caplog):
     with caplog.at_level("WARNING"):
-        await client.post("/k/SUPERSECRETGUESS/mcp")
-    assert "SUPERSECRETGUESS" not in caplog.text and "/k/***" in caplog.text
+        await client.post("/mcp/SUPERSECRETGUESS")
+    assert "SUPERSECRETGUESS" not in caplog.text and "/mcp/***" in caplog.text
 
 
 def test_short_key_rejected():

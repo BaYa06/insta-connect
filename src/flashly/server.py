@@ -142,7 +142,7 @@ def main() -> None:
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8000)
     p.add_argument("--no-auth", action="store_true", help="loopback testing only")
-    p.add_argument("--no-path-key", action="store_true", help="disable the /k/<key>/ URL fallback")
+    p.add_argument("--no-path-key", action="store_true", help="disable the /mcp/<key> URL-path key")
     a = p.parse_args()
     setup_logging()
     s = get_settings()
@@ -155,7 +155,7 @@ def main() -> None:
         app = build_http_app(a.host, a.port, allow_no_auth=a.no_auth, allow_path_key=not a.no_path_key)
     except ConfigError as e:
         raise SystemExit(f"Config error: {mask(e)}") from None
-    # access_log off: URLs may carry the /k/<key>/ fallback credential.
+    # access_log off: URLs carry the /mcp/<key> credential.
     uvicorn.run(app, host=a.host, port=a.port, access_log=False, log_level="warning")
 
 

@@ -92,3 +92,10 @@ async def test_no_secret_in_any_tool_output(settings, fast_sleep):
     for secret in ("EAAsecretvalue1234567", "appsecretvalue999", "m" * 40, "dbpassvalue123", "mock-token"):
         assert secret not in blob
     assert "access_token" not in blob
+
+
+def test_caddyfile_masks_key_path_in_all_logs():
+    c = (ROOT / "Caddyfile").read_text()
+    # default (error) logger and the site access log both mask /mcp/<key>
+    assert c.count('request>uri regexp "^/mcp/[^/?]+" "/mcp/***"') == 2
+    assert "log default" in c and "{$PUBLIC_HOST}" in c and "flush_interval -1" in c
