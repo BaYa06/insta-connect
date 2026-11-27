@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "18000000000000004",
+      "caption": "Mock reel #2 (partial data)",
+      "media_type": "VIDEO",
+      "media_product_type": "REELS",
+      "permalink": "https://www.instagram.com/p/MOCK004/",
+      "timestamp": "2026-09-30T08:00:00+0000",
+      "media_url": "https://example.invalid/mock/reel2.mp4",
+      "thumbnail_url": "https://example.invalid/mock/reel2.jpg",
+      "like_count": 0,
+      "comments_count": 0
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "QVFHcGFnZTI",
+      "after": "QVFHZW5k"
+    }
+  }
+}

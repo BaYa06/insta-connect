@@ -1,0 +1,10 @@
+{
+  "id": "18000000000000002",
+  "caption": "Mock image post",
+  "media_type": "IMAGE",
+  "media_product_type": "FEED",
+  "permalink": "https://www.instagram.com/p/MOCK002/",
+  "timestamp": "2026-11-10T09:30:00+0000",
+  "media_url": "https://example.invalid/mock/img.jpg",
+  "comments_count": 3
+}

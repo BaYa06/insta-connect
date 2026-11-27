@@ -1,0 +1,26 @@
+{
+  "id": "18000000000000003",
+  "caption": "Mock carousel",
+  "media_type": "CAROUSEL_ALBUM",
+  "media_product_type": "FEED",
+  "permalink": "https://www.instagram.com/p/MOCK003/",
+  "timestamp": "2026-10-25T18:15:00+0000",
+  "media_url": "https://example.invalid/mock/car1.jpg",
+  "like_count": 210,
+  "comments_count": 9,
+  "children": {
+    "data": [
+      {
+        "id": "18000000000000031",
+        "media_type": "IMAGE",
+        "media_url": "https://example.invalid/mock/car1.jpg"
+      },
+      {
+        "id": "18000000000000032",
+        "media_type": "VIDEO",
+        "media_url": "https://example.invalid/mock/car2.mp4",
+        "thumbnail_url": "https://example.invalid/mock/car2.jpg"
+      }
+    ]
+  }
+}

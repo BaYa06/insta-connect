@@ -1,0 +1,59 @@
+{
+  "data": [
+    {
+      "id": "18000000000000001",
+      "caption": "Mock reel #1",
+      "media_type": "VIDEO",
+      "media_product_type": "REELS",
+      "permalink": "https://www.instagram.com/p/MOCK001/",
+      "timestamp": "2026-11-20T12:00:00+0000",
+      "media_url": "https://example.invalid/mock/reel1.mp4",
+      "thumbnail_url": "https://example.invalid/mock/reel1.jpg",
+      "like_count": 1520,
+      "comments_count": 48
+    },
+    {
+      "id": "18000000000000002",
+      "caption": "Mock image post",
+      "media_type": "IMAGE",
+      "media_product_type": "FEED",
+      "permalink": "https://www.instagram.com/p/MOCK002/",
+      "timestamp": "2026-11-10T09:30:00+0000",
+      "media_url": "https://example.invalid/mock/img.jpg",
+      "comments_count": 3
+    },
+    {
+      "id": "18000000000000003",
+      "caption": "Mock carousel",
+      "media_type": "CAROUSEL_ALBUM",
+      "media_product_type": "FEED",
+      "permalink": "https://www.instagram.com/p/MOCK003/",
+      "timestamp": "2026-10-25T18:15:00+0000",
+      "media_url": "https://example.invalid/mock/car1.jpg",
+      "like_count": 210,
+      "comments_count": 9,
+      "children": {
+        "data": [
+          {
+            "id": "18000000000000031",
+            "media_type": "IMAGE",
+            "media_url": "https://example.invalid/mock/car1.jpg"
+          },
+          {
+            "id": "18000000000000032",
+            "media_type": "VIDEO",
+            "media_url": "https://example.invalid/mock/car2.mp4",
+            "thumbnail_url": "https://example.invalid/mock/car2.jpg"
+          }
+        ]
+      }
+    }
+  ],
+  "paging": {
+    "cursors": {
+      "before": "QVFHb2Zl",
+      "after": "QVFHcGFnZTI"
+    },
+    "next": "https://graph.facebook.com/v27.0/17841423089085521/media?access_token=EAAFAKELEAKEDTOKEN123456&after=QVFHcGFnZTI"
+  }
+}

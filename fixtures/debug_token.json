@@ -1,0 +1,12 @@
+{
+  "app_id": "1503417951637249",
+  "user_id": "mock-user",
+  "is_valid": true,
+  "days_until_expiry": 45,
+  "scopes": [
+    "instagram_basic",
+    "instagram_manage_insights",
+    "pages_show_list",
+    "pages_read_engagement"
+  ]
+}

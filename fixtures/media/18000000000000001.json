@@ -1,0 +1,12 @@
+{
+  "id": "18000000000000001",
+  "caption": "Mock reel #1",
+  "media_type": "VIDEO",
+  "media_product_type": "REELS",
+  "permalink": "https://www.instagram.com/p/MOCK001/",
+  "timestamp": "2026-11-20T12:00:00+0000",
+  "media_url": "https://example.invalid/mock/reel1.mp4",
+  "thumbnail_url": "https://example.invalid/mock/reel1.jpg",
+  "like_count": 1520,
+  "comments_count": 48
+}
