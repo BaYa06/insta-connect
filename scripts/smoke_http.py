@@ -30,8 +30,8 @@ async def main(base: str) -> int:
             good = r.status_code == 401
             ok &= good
             print(f"[{'OK' if good else 'FAIL'}] {label}: HTTP {r.status_code} (ожидается 401)")
-        r = await h.get(f"{base}/healthz")
-        print(f"[{'OK' if r.status_code == 200 else 'FAIL'}] /healthz: HTTP {r.status_code}")
+        r = await h.get(f"{base}/health")
+        print(f"[{'OK' if r.status_code == 200 else 'FAIL'}] /health: HTTP {r.status_code}")
     async with streamablehttp_client(f"{base}/mcp", headers={"Authorization": f"Bearer {key}"}) as (rd, wr, _):
         async with ClientSession(rd, wr) as s:
             await s.initialize()

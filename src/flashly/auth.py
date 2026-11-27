@@ -4,7 +4,7 @@ Accepted credentials (either one):
   1. `Authorization: Bearer <key>`            (preferred)
   2. URL path prefix `/k/<key>/mcp`           (fallback for connector UIs that only take a URL)
 
-Everything else gets 401. `/healthz` is open and returns no data.
+Everything else gets 401. `/health` (and `/healthz`) is open and returns no data.
 The key is never logged; failures log only the client address and path *without* the key.
 """
 from __future__ import annotations
@@ -42,7 +42,7 @@ class BearerAuthMiddleware:
                 return await self.app(scope, receive, send)
             return  # websockets etc. are not part of this server
         path: str = scope["path"]
-        if path == "/healthz":
+        if path in ("/health", "/healthz"):
             return await _send_json(send, 200, {"ok": True})
 
         headers = {k.lower(): v for k, v in scope["headers"]}

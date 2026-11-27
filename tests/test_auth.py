@@ -51,8 +51,9 @@ async def test_path_key_can_be_disabled():
     assert (await c.post(f"/k/{KEY}/mcp")).status_code == 401
 
 
-async def test_healthz_open_and_data_free(client):
-    r = await client.get("/healthz")
+@pytest.mark.parametrize("path", ["/health", "/healthz"])
+async def test_health_open_and_data_free(client, path):
+    r = await client.get(path)
     assert r.status_code == 200 and r.json() == {"ok": True}
 
 

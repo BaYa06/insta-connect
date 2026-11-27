@@ -1,7 +1,7 @@
 # Flashly Growth AI
 
 Read-only MCP server for Instagram analytics (@flashly_official) via the official Graph API.
-Status: stages 1-4 (core, tools, live verification, auth + access).
+Status: stages 1-5 done, 8 prepared (files only), 6-7 not done. Deployment: see `deploy/README.md`.
 
 ## Setup
 ```bash

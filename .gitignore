@@ -9,3 +9,10 @@ __pycache__/
 *.egg-info/
 data/
 media_cache/
+*.env
+*.pem
+*.key
+media/
+backups/
+pgdata/
+postgres_data/

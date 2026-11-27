@@ -23,13 +23,13 @@ class Settings(BaseSettings):
     graph_api_version: str = Field("v27.0", validation_alias=AliasChoices('graph_api_version', 'META_GRAPH_API_VERSION'))
     graph_base_url: str = "https://graph.facebook.com"
     meta_app_id: str = "1503417951637249"
-    facebook_page_id: str = "1481254898400944"
+    facebook_page_id: str = Field("1481254898400944", validation_alias=AliasChoices('facebook_page_id', 'FB_PAGE_ID'))
     ig_user_id: str = Field("17841423089085521", validation_alias=AliasChoices('ig_user_id', 'INSTAGRAM_USER_ID'))
     ig_username: str = Field("flashly_official", validation_alias=AliasChoices('ig_username', 'INSTAGRAM_USERNAME'))
 
     meta_app_secret: SecretStr | None = Field(None, validation_alias=AliasChoices('meta_app_secret', 'APP_SECRET', 'META_APP_SECRET'))
     ig_access_token: SecretStr | None = Field(None, validation_alias=AliasChoices('ig_access_token', 'INSTAGRAM_ACCESS_TOKEN'))
-    mcp_auth_token: SecretStr | None = None
+    mcp_auth_token: SecretStr | None = Field(None, validation_alias=AliasChoices('mcp_auth_token', 'MCP_API_KEY'))
 
     http_timeout_seconds: float = 30.0
     max_retries: int = 3
@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     retry_max_delay_seconds: float = 30.0
 
     fixtures_dir: Path = ROOT / "fixtures"
+
+    # Stage 5: history storage + collector
+    database_url: SecretStr | None = None   # postgresql+psycopg://user:pass@host/db (contains a password)
+    collect_interval_seconds: int = 3600
+    collect_max_media: int = 200
+    token_warn_days: str = "14,7,3"
+    notify_channel: Literal["log", "telegram", "email"] = "log"  # only 'log' is implemented
 
     def token(self) -> str:
         if not self.ig_access_token or not self.ig_access_token.get_secret_value():
@@ -47,7 +54,7 @@ class Settings(BaseSettings):
         self.token()
 
     def register_secrets(self) -> None:
-        for s in (self.meta_app_secret, self.ig_access_token, self.mcp_auth_token):
+        for s in (self.meta_app_secret, self.ig_access_token, self.mcp_auth_token, self.database_url):
             if s:
                 register_secret(s.get_secret_value())
 

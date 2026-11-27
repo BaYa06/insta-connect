@@ -1,0 +1,8 @@
+# Automatic HTTPS (Let's Encrypt) for the host in PUBLIC_HOST. Ports 80/443 must be reachable.
+# No access log on purpose: the /k/<key>/ URL fallback carries the credential in the path.
+{$PUBLIC_HOST} {
+	encode gzip
+	reverse_proxy mcp-server:8000 {
+		flush_interval -1   # do not buffer SSE streams
+	}
+}
